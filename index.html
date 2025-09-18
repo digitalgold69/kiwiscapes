@@ -280,6 +280,7 @@ const CONFIG = {
   PRESET_PROMPT:
     "Keep results photorealistic and faithful to the original photo. Preserve everything except what the user asks to change. No text or people. Keep consistent lighting, materials, buildings, garden size, doors, windows, surroundings and perspective. Final image must look like a real photograph.",
   HOW_STEP_IMAGES: ["https://i.ibb.co/tMB8NYM7/images-before-after-nov19-West-before.webp","https://i.ibb.co/84zGpY6n/Add-a-subheading-2.png","https://i.ibb.co/bjhDYjwH/eec17a04-71d0-4b16-aa23-f17b82b526cd.png"],
+  PROMPT_PLACEHOLDER: "Add a patio, plant some trees, and make the lawn greener."
   REQUEST_TIMEOUT_MS: 180000,
   MAX_FILE_MB: 5,
   EMAIL: { enabled: false }
@@ -338,19 +339,25 @@ const loadingOverlay = document.getElementById('loadingOverlay');
   // Text
   brandName.textContent = CONFIG.BRAND_NAME;
   pageTitle.textContent = CONFIG.TITLE;
-  pageSub.textContent = "Upload a photo and preview changes in 60 seconds.";
+  pageSub.textContent   = "Upload a photo and preview changes in 60 seconds.";
   verticalPill.textContent = `${CONFIG.AREA_NOUN} Visualizer`;
 
   // Nouns
-  const noun = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase();
+  const noun = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase(); // 'Kitchen' is just a fallback
   const el2 = document.getElementById('areaWord2Label'); if (el2) el2.textContent = noun;
-  const el1 = document.getElementById('areaWord1'); if (el1) el1.textContent = noun;
+  const el1 = document.getElementById('areaWord1');     if (el1) el1.textContent = noun;
 
   // Logo
   if (CONFIG.LOGO_URL){
     logoImg.src = CONFIG.LOGO_URL;
     logoImg.style.display = 'block';
     logoFallback.style.display = 'none';
+  }
+
+  // Prompt box placeholder (pulled from CONFIG)
+  const promptBox = document.getElementById('prompt2Input');
+  if (promptBox && CONFIG.PROMPT_PLACEHOLDER) {
+    promptBox.placeholder = CONFIG.PROMPT_PLACEHOLDER;
   }
 
   // How it works images
