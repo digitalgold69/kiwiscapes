@@ -477,7 +477,11 @@ async function generateNow(){
     return;
   }
 
-  const areaToEdit = (CONFIG.AREA_TO_EDIT_DEFAULT || CONFIG.AREA_NOUN || 'kitchen').toLowerCase();
+const areaToEdit = (
+  CONFIG.DEFAULT_AREA && CONFIG.DEFAULT_AREA !== 'auto'
+    ? CONFIG.DEFAULT_AREA
+    : (CONFIG.AREA_NOUN || 'kitchen')
+).toLowerCase();
 
   const combinedPrompt =
     `${CONFIG.PRESET_PROMPT}\n\n` +
