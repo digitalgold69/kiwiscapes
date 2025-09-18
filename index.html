@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>See It Done — Visualiser</title>
+<style>
+/* ==== Base (dark palette variables kept for the dark tiles) ==== */
+:root{
+  --bg:#0b0f14;--panel:#0f141b;--panel-2:#0b1118;--brand:#5b9dff;--brand-2:#87b6ff;
+  --ok:#55d69e;--warn:#f0b232;--err:#ff6b6b;--ink:#dce6f2;--muted:#9fb3c8;--border:#1b2330;
+  --glow:0 10px 30px rgba(91,157,255,.18);
+}
+/* ==== App-wide LIGHT theme ==== */
+body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fff;color:#000;line-height:1.6}
+.container{max-width:980px;margin:0 auto;padding:20px}
+
+header{position:sticky;top:0;background:#fff !important;border-bottom:1px solid #e8eef7 !important;z-index:50}
+header *{color:#000 !important}
+
+h1{font-size:1.9rem;margin:.25rem 0 .15rem}
+p.lead{color:#374151}
+
+.card{background:#fff;color:#000;border:1px solid #e8eef7;box-shadow:0 2px 8px rgba(18,32,56,.06);border-radius:16px;padding:18px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:0;border-radius:10px;padding:1rem 1.25rem;cursor:pointer;transition:.15s;font-size:1.25rem;font-weight:700;color:#000 !important}
+.btn-primary{background:var(--brand);box-shadow:var(--glow)}
+.btn-primary:hover{filter:brightness(1.05)}
+.btn-ghost{background:transparent;border:1px solid #d6deea}
+
+.field, input, textarea, select{
+  width:100%;background:#fff;color:#111827;
+  border:1px solid #d6deea;border-radius:10px;padding:1rem;box-shadow:none
+}
+input::placeholder,textarea::placeholder{color:#6b7280}
+input:focus,textarea:focus,select:focus{
+  outline:none;border-color:var(--brand,#3B82F6);box-shadow:0 0 0 4px rgba(59,130,246,.15)
+}
+
+.preview{width:100%;height:180px;background:#f8fafc;border:1px solid #e8eef7;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.preview img{max-width:100%;max-height:100%;object-fit:contain}
+.result{width:100%;height:420px;background:#f8fafc;border:1px solid #e8eef7;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.result img{max-width:100%;max-height:100%;object-fit:contain}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.subtle{color:#6b7280;font-size:.95rem}
+
+/* ---- HOW IT WORKS layout + title ---- */
+.section-heading{
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: .75rem;
+  color: #000;       /* title stays black on the white card */
+}
+
+.how{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));  /* desktop: side by side */
+  gap: 12px;
+}
+
+/* Mobile & tablet: stack the 3 cards vertically */
+@media (max-width: 1023px){
+  .how{ grid-template-columns: 1fr; }
+}
+
+/* Keep the tiles dark with white text */
+.how .mini{
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+}
+.how .mini img{
+  width:100%; height:120px; object-fit:cover;
+  border-radius:10px; border:1px solid var(--border); background:#0b1118;
+}
+.how .mini, .how .mini *{ color:#fff !important; }
+
+
+/* Status pill */
+.pill{font-size:.8rem;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:.2rem .6rem;margin-left:.5rem;color:#000}
+
+/* Loading panel bars (secondary) */
+.loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:26px}
+.bar{width:100%;height:3px;background:linear-gradient(90deg,var(--brand-2,#60A5FA),var(--brand,#3B82F6));background-size:180% 100%;animation:bar 1.2s linear infinite;border-radius:999px;opacity:.85}
+@keyframes bar{0%{background-position:-120% 0}100%{background-position:120% 0}}
+
+/* Toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(120%);background:#111827;border:1px solid #0b1118;padding:10px 16px;border-radius:10px;color:#fff;opacity:0;transition:.25s;z-index:1000}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:#ff6b6b;border-color:#e65252}
+
+/* Hide any legacy progress bar */
+#progressBar{display:none !important}
+
+/* Full-screen overlay spinner (primary loader) */
+.loading-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(255,255,255,.85);z-index:2000}
+.loading-overlay.show{display:flex}
+.loader-spinner{width:56px;height:56px;border-radius:50%;border:4px solid #e5e7eb;border-top-color:var(--brand,#3B82F6);animation:sid-spin 1s linear infinite;margin-bottom:12px}
+.loader-text{color:#111827}
+@keyframes sid-spin{to{transform:rotate(360deg)}}
+
+.logo-img{height:100px;display:none}
+.logo-mark{width:50px;height:50px;border-radius:999px;background:radial-gradient(circle at 30% 30%,var(--brand),var(--brand-2))}
+.brand{display:flex;align-items:center;gap:.6rem;cursor:pointer}
+
+@media (max-width:720px){.how{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+/* === HOW IT WORKS tiles: stay dark + render 763×507 images correctly === */
+#sectionA .how .mini{
+  background: var(--panel) !important;          /* keep dark tile */
+  color: var(--ink-on-dark) !important;         /* light text on dark */
+  border: 1px solid var(--border) !important;
+}
+
+/* force the tile text to remain white on dark */
+#sectionA .how .mini, 
+#sectionA .how .mini * {
+  color: #fff !important;
+}
+
+/* images: preserve native ratio, no cropping, no white bg */
+#sectionA .how .mini img{
+  display: block;
+  width: 100%;
+  height: auto !important;          /* keep 763×507 ratio */
+  aspect-ratio: 763 / 507;          /* consistent heights across cards */
+  object-fit: contain;              /* no crop; letterbox if needed */
+  background: transparent !important; /* don't bleach the card */
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+/* --- Header centered; pill under name on mobile --- */
+.header-centered { justify-content: center; }
+.brand { display:flex; align-items:center; gap:10px; text-align:center; }
+.brand-title { display:flex; align-items:center; gap:8px; }
+#verticalPill { white-space:nowrap; }
+
+@media (max-width: 600px){
+  .brand { flex-direction:column; }
+  .brand-title { flex-direction:column; gap:6px; }
+}
+
+/* --- Hero polish --- */
+.hero{
+  background: linear-gradient(180deg, rgba(59,130,246,.08), rgba(59,130,246,0) 60%);
+  border:1px solid #e8eef7; border-radius:16px; padding:18px 20px; margin:14px 0;
+}
+.hero h1{ margin:0 0 6px; font-size:clamp(24px,4.5vw,40px); line-height:1.15; }
+.hero .lead{ margin:0; color:#334155; font-size:clamp(14px,2.6vw,18px); }
+
+/* --- How it works: dark cards, white text, lazy images keep ratio --- */
+.how-title{ margin:0 0 10px; font-weight:700; }
+#sectionA .how{ display:grid; gap:1rem; grid-template-columns:repeat(3,minmax(0,1fr)); }
+@media (max-width: 720px){ #sectionA .how{ grid-template-columns:1fr; } }
+
+#sectionA .mini{
+  background:var(--panel); color:#fff; border:1px solid var(--border);
+  box-shadow:0 4px 12px rgba(0,0,0,.2); border-radius:16px; padding:14px;
+}
+#sectionA .mini *{ color:#fff; }
+#sectionA .mini strong{ color:#fff; display:block; margin-bottom:.5rem; }
+
+/* 763×507 correct ratio, crisp */
+#sectionA .mini img{
+  width:100%; height:auto; aspect-ratio:763 / 507; object-fit:cover;
+  border-radius:10px; border:1px solid var(--border); display:block; image-rendering:auto;
+}
+
+/* --- Upload button text alignment fix --- */
+.upload-btn{
+  display:flex; align-items:center; justify-content:center;
+  text-align:center; white-space:normal; line-height:1.25;
+}
+.upload-btn .btn-text{ display:inline-block; }
+.upload-btn .noun{ font-weight:700; margin-left:.25ch; }
+/* --- CENTER THE HEADER --- */
+.header-content.header-centered { 
+  justify-content: center !important;   /* overrides space-between */
+}
+.brand { 
+  display: flex; 
+  align-items: center; 
+  gap: 10px; 
+  text-align: center; 
+}
+.brand-title { 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+}
+@media (max-width: 600px){
+  .brand { flex-direction: column; }
+  .brand-title { flex-direction: column; gap: 6px; }
+}
+
+/* --- CENTER THE HERO TEXT --- */
+.hero { text-align: center; }
+
+/* --- NARROW THE APP ON DESKTOP (25%) --- */
+/* Wrap your sections in a .content-narrow (see step 2) */
+.content-narrow { width: 100%; }
+@media (min-width: 1024px){
+  .content-narrow { 
+    width: 75%;          /* 25% narrower than full width */
+    margin-inline: auto; /* center horizontally */
+  }
+}
+/* ----- Header centering & responsive pill ----- */
+.header-content.header-centered{
+  justify-content:center !important;
+}
+.brand{
+  display:flex; align-items:center; gap:12px;
+  margin:0 auto; text-align:center;
+}
+.brand-title{
+  display:flex; flex-direction:column; align-items:center; gap:6px;
+}
+@media (min-width: 900px){
+  .brand-title{ flex-direction:row; gap:10px; }
+  #verticalPill{ margin-left:6px; }
+}
+/* --- Center the header on desktop, stack the pill on mobile --- */
+header { background:#fff !important; border-bottom:1px solid #e8eef7 !important; }
+header * { color:#000 !important; }
+
+/* Override the old space-between rule */
+.header-content { 
+  display:flex !important; 
+  justify-content:center !important; 
+  align-items:center !important; 
+  padding:16px 0 !important;
+}
+
+/* Center the brand row */
+.brand-centered{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;       /* lets the pill wrap when narrow */
+  text-align:center;
+  margin:0 auto;        /* centers the block in the container */
+}
+
+/* Logo sizing */
+.logo-img{ height:72px; display:none; }   /* shown when you set a logo URL in JS */
+.logo-mark{ width:48px; height:48px; border-radius:12px; }
+
+/* Put the pill on its own line on small screens */
+@media (max-width: 640px){
+  .brand-centered{flex-direction:column;}
+  #verticalPill{margin:0;}
+}
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-content header-centered">
+    <div class="brand brand-centered" id="brandHome">
+      <img id="logoImg" class="logo-img" alt="Logo" />
+      <div class="logo-mark" id="logoFallback"></div>
+      <strong class="app-name" id="brandName">Odd Fellows Contracting</strong>
+      <span class="pill" id="verticalPill">Kitchen Visualizer</span>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <div class="content-narrow">
+<section class="hero">
+  <h1 id="pageTitle">Visualise Your New Kitchen</h1>
+  <p class="lead">Upload a photo and preview changes in 60 seconds.</p>
+  <!-- Upload CTA (centered) -->
+  <section id="uploadCTA" class="card" style="margin-top:14px">
+    <div class="cta-center">
+      <button class="btn btn-primary" id="uploadBtn">
+        <span class="btn-label">
+          Upload an image of your <span id="areaWord2Label"></span>
+        </span>
+      </button>
+      <input id="fileInput" type="file" accept="image/*" hidden />
+      <span class="subtle">JPG or PNG, up to 5MB.</span>
+    </div>
+  </section>
+
+
+<!-- A) HOW IT WORKS + UPLOAD -->
+<section id="sectionA" class="card" style="margin-top:14px">
+  <h3 class="how-title">How it works</h3>
+
+  <div class="how">
+    <div class="mini">
+      <strong>1) Upload</strong>
+      <img
+        id="howImg1"
+        alt="Step 1"
+        loading="lazy"
+        decoding="async"
+        width="763"
+        height="507"
+      />
+      <div>Upload an image of your <span id="areaWord1">kitchen</span>.</div>
+    </div>
+
+    <div class="mini">
+      <strong>2) Describe</strong>
+      <img
+        id="howImg2"
+        alt="Step 2"
+        loading="lazy"
+        decoding="async"
+        width="763"
+        height="507"
+      />
+      <div>Tell us what to change.</div>
+    </div>
+
+    <div class="mini">
+      <strong>3) See it Done</strong>
+      <img
+        id="howImg3"
+        alt="Step 3"
+        loading="lazy"
+        decoding="async"
+        width="763"
+        height="507"
+      />
+      <div>Get a photorealistic result.</div>
+    </div>
+  </div>
+
+</section>
+
+    <!-- B) PROMPT DIALOG -->
+    <section id="sectionB" class="card" style="display:none;margin-top:14px">
+  <div class="preview"><img id="previewSmall" alt="Preview" /></div>
+
+  <div class="row" style="margin:10px 0 6px">
+    <button class="btn btn-ghost" id="changeImageBtn">Change image</button>
+  </div>
+
+  <div class="stack" style="margin-top:6px">
+    <label>Describe your changes</label>
+    <textarea id="prompt2Input" class="field" placeholder="Paint the backsplash white, make the countertop white granite and make the cupboard door handles gold."></textarea>
+  </div>
+
+  <div class="row" style="margin-top:12px">
+    <button class="btn btn-primary" id="generateNowBtn">Generate now</button>
+  </div>
+  <p class="subtle" style="margin-top:6px">Please be patient — the AI can take up to 60 seconds.</p>
+</section>
+
+    <!-- LOADING (secondary, behind overlay) -->
+    <section id="loadingPanel" class="card loading" style="display:none;margin-top:14px">
+      <div class="bar"></div>
+      <div class="bar" style="width:70%"></div>
+      <div class="bar" style="width:40%"></div>
+      <p class="subtle" id="loadingMessage">Processing your image…</p>
+    </section>
+
+    <!-- C) RESULT -->
+    <section id="sectionC" class="card" style="display:none;margin-top:14px">
+      <div class="result"><img id="resultImage" alt="Result" /></div>
+      <div class="row" style="margin-top:12px">
+        <button class="btn btn-primary" id="generateMoreBtn">Generate more</button>
+      </div>
+
+      <div class="grid2" style="margin-top:16px">
+        <div class="row" style="flex-direction:column;gap:10px">
+          <strong>Email me this</strong>
+          <div class="row" style="align-items:center">
+            <input id="emailInput" type="email" class="field" placeholder="you@example.com" />
+            <button class="btn btn-ghost" id="emailSendBtn">Send</button>
+          </div>
+        </div>
+        <div>
+          <strong style="display:block;margin-bottom:6px">Original</strong>
+          <div class="preview" style="height:260px"><img id="originalImage" alt="Original" /></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<!-- Full-screen loading overlay -->
+<div id="loadingOverlay" class="loading-overlay" aria-live="polite">
+  <div class="loader-spinner"></div>
+  <p class="loader-text">Processing your image… this can take up to 60 seconds.</p>
+</div>
+
+<script>
+/************* CONFIG — EDIT PER BRAND *************/
+const CONFIG = {
+  BRAND_NAME: "Kiwiscapes",
+  LOGO_URL: "https://scontent-lhr8-1.xx.fbcdn.net/v/t39.30808-6/295299219_744734090017986_6199590293080603021_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=bJ8P4Z6IHqYQ7kNvwGHDC8n&_nc_oc=AdkKG5zVmWGwNBVRsS1vU6bfww69T8PKIxqVCbepDzZOF4wKCrvjktvTsCjEL-XrYGaJ_gxVdGTpnYgTH1NaZSk3&_nc_zt=23&_nc_ht=scontent-lhr8-1.xx&_nc_gid=ZuLUGCRlOFO4GuDQ6yayoQ&oh=00_AfbD8AK2Pu5GyjJP8ql58GlWRsqx_Vr6yadb80XCLjNztQ&oe=68D21AFA",
+  TITLE: "Visualise Your New Garden",
+  AREA_NOUN: "Garden",
+    DEFAULT_AREA: "auto", // or "wall" / "all" depending on what your worker supports
+  PRIMARY: "#5d7749",
+  ACCENT:  "#60A5FA",
+  WORKER_URL: "https://seeitdone-demo.muddy-silence-4f5b.workers.dev",
+  PRESET_PROMPT:
+    "Keep results photorealistic and faithful to the original photo. Preserve everything except what the user asks to change. No text or people. Keep consistent lighting, materials, buildings, garden size, doors, windows, surroundings and perspective. Final image must look like a real photograph.",
+  HOW_STEP_IMAGES: ["https://i.ibb.co/tMB8NYM7/images-before-after-nov19-West-before.webp","https://i.ibb.co/84zGpY6n/Add-a-subheading-2.png","https://i.ibb.co/bjhDYjwH/eec17a04-71d0-4b16-aa23-f17b82b526cd.png"],
+  REQUEST_TIMEOUT_MS: 180000,
+  MAX_FILE_MB: 5,
+  EMAIL: { enabled: false }
+};
+
+/************* STATE *************/
+let currentFile = null;
+let originalImageUrl = null;
+let letterboxedDataUrl = null;
+let origW = 0, origH = 0, scale = 1, finalWidth = 0, finalHeight = 0, paddedX = 0, paddedY = 0;
+let resultRestoredUrl = null;
+
+/************* ELEMS *************/
+const $  = (s)=>document.querySelector(s);
+const brandHome   = $('#brandHome');
+const logoImg     = $('#logoImg');
+const logoFallback= $('#logoFallback');
+const brandName   = $('#brandName');
+const pageTitle   = $('#pageTitle');
+const verticalPill= $('#verticalPill');
+const statusMsg   = $('#statusMsg');
+
+const sectionA = $('#sectionA');
+const sectionB = $('#sectionB');
+const sectionC = $('#sectionC');
+const loadingPanel = $('#loadingPanel');
+
+const uploadBtn = $('#uploadBtn');
+const fileInput = $('#fileInput');
+const changeImageBtn = $('#changeImageBtn');
+
+const prompt1Input = $('#prompt1Input');
+const prompt2Input = $('#prompt2Input');
+const generateNowBtn = $('#generateNowBtn');
+
+const resultImage   = $('#resultImage');
+const originalImage = $('#originalImage');
+const previewSmall  = $('#previewSmall');
+const generateMoreBtn = $('#generateMoreBtn');
+
+const emailInput = $('#emailInput');
+const emailSendBtn = $('#emailSendBtn');
+
+const howImg1 = $('#howImg1');
+const howImg2 = $('#howImg2');
+const howImg3 = $('#howImg3');
+
+const toast = $('#toast');
+const loadingOverlay = document.getElementById('loadingOverlay');
+
+/************* BRANDING *************/
+(function initBranding(){
+  document.documentElement.style.setProperty('--brand',  CONFIG.PRIMARY);
+  document.documentElement.style.setProperty('--brand-2',CONFIG.ACCENT);
+
+  brandName.textContent = CONFIG.BRAND_NAME;
+  pageTitle.textContent = CONFIG.TITLE;
+  verticalPill.textContent = `${CONFIG.AREA_NOUN} Visualizer`;
+
+  ['#areaWord1','#areaWord2','#areaWord3'].forEach(id=>{
+    const el = document.querySelector(id);
+    if (el) el.textContent = CONFIG.AREA_NOUN.toLowerCase();
+    const noun = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase();
+const areaWord2Label = document.getElementById('areaWord2Label');
+if (areaWord2Label) areaWord2Label.textContent = noun;
+
+  });
+
+  if (CONFIG.LOGO_URL){
+    logoImg.src = CONFIG.LOGO_URL;
+    logoImg.style.display = 'block';
+    logoFallback.style.display = 'none';
+  }
+  [howImg1, howImg2, howImg3].forEach((el, i)=>{
+    const url = CONFIG.HOW_STEP_IMAGES?.[i];
+    if (url){ el.src = url; el.style.display = 'block'; }
+  });
+})();
+
+/************* HELPERS *************/
+function show(section){
+  [sectionA, sectionB, sectionC, loadingPanel].forEach(el=>el.style.display='none');
+  section.style.display = 'block';
+}
+function showToast(msg, type){
+  toast.textContent = msg;
+  toast.className = 'toast' + (type==='error' ? ' error' : '');
+  requestAnimationFrame(()=> toast.classList.add('show'));
+  setTimeout(()=> toast.classList.remove('show'), 2500);
+}
+function resetToStart(){
+  prompt2Input.value = '';
+  if (originalImageUrl) { URL.revokeObjectURL(originalImageUrl); }
+  fileInput.value = '';
+  currentFile = null;
+  originalImageUrl = null;
+  letterboxedDataUrl = null;
+  resultRestoredUrl = null;
+
+  previewSmall.removeAttribute('src');
+  resultImage.removeAttribute('src');
+  originalImage.removeAttribute('src');
+
+  show(sectionA);           // back to How it works
+  setHeroState('home');     // 👉 HERO: HOME
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showLoadingOverlay(msg){
+  if (!loadingOverlay) return;
+  const p = loadingOverlay.querySelector('.loader-text');
+  if (p && msg) p.textContent = msg;
+  loadingOverlay.classList.add('show');
+}
+function hideLoadingOverlay(){
+  if (!loadingOverlay) return;
+  loadingOverlay.classList.remove('show');
+}
+
+/************* IMAGE HANDLING (LETTERBOX 1024) *************/
+async function handleFileSelect(e){
+  const file = e?.target?.files?.[0];
+  if (!file) return;
+
+  if (!/^image\//.test(file.type)) return showToast('Please select an image file','error');
+  if (file.size > CONFIG.MAX_FILE_MB * 1024 * 1024) return showToast(`File exceeds ${CONFIG.MAX_FILE_MB}MB`,'error');
+
+  currentFile = file;
+  if (originalImageUrl) URL.revokeObjectURL(originalImageUrl);
+  originalImageUrl = URL.createObjectURL(file);
+
+  const img = new Image();
+  img.onload = ()=>{
+    origW = img.naturalWidth; origH = img.naturalHeight;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = 1024; canvas.height = 1024;
+    const ctx = canvas.getContext('2d');
+
+    scale = Math.min(1024 / origW, 1024 / origH);
+    finalWidth  = Math.round(origW * scale);
+    finalHeight = Math.round(origH * scale);
+    paddedX = Math.round((1024 - finalWidth) / 2);
+    paddedY = Math.round((1024 - finalHeight) / 2);
+
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.clearRect(0,0,1024,1024);
+    ctx.drawImage(img, paddedX, paddedY, finalWidth, finalHeight);
+
+    letterboxedDataUrl = canvas.toDataURL('image/png', 1.0);
+
+    previewSmall.src = originalImageUrl;
+    show(sectionB);
+  };
+  img.onerror = ()=> showToast('Could not read image','error');
+  img.src = originalImageUrl;
+}
+
+/************* GENERATE (MASK ➜ INPAINT ➜ RESTORE) *************/
+async function generateNow(){
+  if (!currentFile){
+    showToast(`Upload a ${CONFIG.AREA_NOUN.toLowerCase()} photo first`,'error');
+    return;
+  }
+
+  // ONLY the description prompt now
+  const userDetail = (prompt2Input.value || '').trim();
+  if (!userDetail){
+    showToast('Please describe your changes','error');
+    return;
+  }
+
+  // We still need an area for mask; default to the noun
+  const areaToEdit = (CONFIG.AREA_TO_EDIT_DEFAULT || CONFIG.AREA_NOUN || 'kitchen').toLowerCase();
+
+  const combinedPrompt =
+    `${CONFIG.PRESET_PROMPT}\n\n` +
+    `Brand: ${CONFIG.BRAND_NAME}\n` +
+    `Vertical: ${CONFIG.AREA_NOUN}\n` +
+    `User request: ${userDetail}`;
+
+  // 👉 switch hero to LOADING immediately
+  setHeroState('loading');
+
+  // show loading panel
+  show(loadingPanel);
+  document.getElementById('loadingMessage').textContent =
+    'Please be patient, the AI can take up to 60 seconds to process your image.';
+
+  const ctrl = new AbortController();
+  const kill = setTimeout(()=> ctrl.abort(), CONFIG.REQUEST_TIMEOUT_MS);
+
+  try {
+    // 1) mask
+    const maskRes = await fetch(`${CONFIG.WORKER_URL}/generate-mask`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        imageBase64: letterboxedDataUrl,
+        areaToEdit,
+        imageMetadata: { origW, origH, finalWidth, finalHeight, paddedX, paddedY, scale }
+      }),
+      signal: ctrl.signal
+    });
+    if (!maskRes.ok){
+      const err = await maskRes.json().catch(()=>({}));
+      throw new Error(err.error || err.message || 'Mask generation failed');
+    }
+    const { maskBase64 } = await maskRes.json();
+    if (!maskBase64) throw new Error('No mask returned from server');
+
+    // 2) inpaint
+    const paintRes = await fetch(`${CONFIG.WORKER_URL}/inpainting`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        prompt: combinedPrompt,
+        init_image: letterboxedDataUrl,
+        mask_image: maskBase64
+      }),
+      signal: ctrl.signal
+    });
+    if (!paintRes.ok){
+      const err = await paintRes.json().catch(()=>({}));
+      throw new Error(err.error || err.message || 'Inpainting failed');
+    }
+    const paintJson = await paintRes.json();
+    if (!paintJson.images || !paintJson.images[0]) throw new Error('No image returned from inpainting');
+    const result1024 = `data:image/png;base64,${paintJson.images[0]}`;
+
+    // 3) de-letterbox to original size
+    const out = new Image();
+    out.onload = ()=>{
+      const c = document.createElement('canvas');
+      c.width = origW; c.height = origH;
+      const ctx = c.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(out, paddedX, paddedY, finalWidth, finalHeight, 0, 0, origW, origH);
+      resultRestoredUrl = c.toDataURL('image/png', 1.0);
+
+      // show result section
+      resultImage.src = resultRestoredUrl;
+      originalImage.src = originalImageUrl;
+      show(sectionC);
+
+      // 👉 HERO: READY + scroll top
+      setHeroState('ready');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      showToast('Image generated successfully!');
+    };
+    out.onerror = ()=> { throw new Error('Failed to decode result image'); };
+    out.src = result1024;
+
+  } catch (err) {
+    // back to prompts if something failed
+    show(sectionB);
+    setHeroState('home');
+    showToast(err.message || 'Something went wrong','error');
+  } finally {
+    clearTimeout(kill);
+  }
+}
+
+
+/************* EMAIL (placeholder) *************/
+async function emailResult(){
+  const email = (emailInput.value||'').trim();
+  if (!email) return showToast('Enter your email first','error');
+  showToast('We’ll email your images shortly.');
+}
+
+/************* EVENTS *************/
+uploadBtn.addEventListener('click', ()=> fileInput.click());
+changeImageBtn.addEventListener('click', ()=> fileInput.click());
+fileInput.addEventListener('change', handleFileSelect);
+generateNowBtn.addEventListener('click', generateNow);
+generateMoreBtn.addEventListener('click', resetToStart);
+brandHome.addEventListener('click', resetToStart);
+emailSendBtn.addEventListener('click', emailResult);
+
+/************* STATUS PING *************/
+(async function ping(){
+  try{
+    const r = await fetch(`${CONFIG.WORKER_URL}/`, {method:'GET'});
+    statusMsg.textContent = r.ok ? 'API connected' : 'API error';
+    statusMsg.style.color = r.ok ? '#10b981' : '#ef4444';
+  } catch{
+    statusMsg.textContent = 'API unreachable'; statusMsg.style.color = '#ef4444';
+  }
+})();
+function setHeroState(state) {
+  if (!heroTitle || !heroSub) return;
+
+  if (state === 'home') {
+    // Main page
+    heroTitle.textContent = CONFIG.TITLE; // e.g., "Visualise Your New Kitchen"
+    heroSub.textContent   = "Upload a photo and preview changes in 60 seconds.";
+    if (heroUploadRow) heroUploadRow.style.display = 'flex';
+  }
+
+  if (state === 'loading') {
+    // During generation
+    heroTitle.textContent = "Our AI fairys are working on your image!";
+    heroSub.textContent   = "";
+    if (heroUploadRow) heroUploadRow.style.display = 'none';
+  }
+
+  if (state === 'ready') {
+    // After result
+    heroTitle.textContent = "Your Image is Ready";
+    heroSub.textContent   = "";
+    if (heroUploadRow) heroUploadRow.style.display = 'none';
+  }
+}
+// === HERO refs (match IDs in HTML above) ===
+const heroTitle     = document.getElementById('heroTitle');
+const heroSub       = document.getElementById('heroSub');
+const heroUploadRow = document.getElementById('heroUploadRow');
+
+// Keep the noun inside the upload button label in sync
+const areaWord2Label = document.getElementById('areaWord2Label');
+if (areaWord2Label) areaWord2Label.textContent = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase();
+
+// === HERO state machine ===
+function setHeroState(state) {
+  if (!heroTitle || !heroSub) return;
+
+  if (state === 'home') {
+    heroTitle.textContent = CONFIG.TITLE; // e.g. "Visualise Your New Kitchen"
+    heroSub.textContent   = "Upload a photo and preview changes in 60 seconds.";
+    if (heroUploadRow) heroUploadRow.style.display = 'flex';
+  }
+
+  if (state === 'loading') {
+    heroTitle.textContent = "Our AI fairys are working on your image!";
+    heroSub.textContent   = "";
+    if (heroUploadRow) heroUploadRow.style.display = 'none';
+  }
+
+  if (state === 'ready') {
+    heroTitle.textContent = "Your Image is Ready";
+    heroSub.textContent   = "";
+    if (heroUploadRow) heroUploadRow.style.display = 'none';
+  }
+}
+
+// Set initial hero state when the script loads
+setHeroState('home');
+// ---------- UNIVERSAL HERO STATE (drop-in) ----------
+function setHeroState(state) {
+  const titleEls = document.querySelectorAll('#heroTitle, #pageTitle, .hero h1');
+  const subEls   = document.querySelectorAll('#heroSub, .hero .lead, .lead');
+  const uploadRows = document.querySelectorAll('#heroUploadRow, #uploadCTA, .cta-center');
+
+  function setText(els, text){ els.forEach(el => { if (el) el.textContent = text; }); }
+  function show(elList){ elList.forEach(el => { if (el) el.style.display = 'flex'; }); }
+  function hide(elList){ elList.forEach(el => { if (el) el.style.display = 'none'; }); }
+
+  if (state === 'home') {
+    setText(titleEls, (window.CONFIG?.TITLE) || 'Visualise Your New Kitchen');
+    setText(subEls, 'Upload a photo and preview changes in 60 seconds.');
+    show(uploadRows);
+  }
+  if (state === 'loading') {
+    setText(titleEls, 'Our AI fairys are working on your image!');
+    setText(subEls, '');
+    hide(uploadRows);
+  }
+  if (state === 'ready') {
+    setText(titleEls, 'Your Image is Ready');
+    setText(subEls, '');
+    hide(uploadRows);
+  }
+}
+
+// keep noun in the upload button label correct if it's present
+(function syncNounInHero(){
+  const el = document.getElementById('areaWord2Label');
+  if (el && window.CONFIG?.AREA_NOUN) el.textContent = CONFIG.AREA_NOUN.toLowerCase();
+})();
+
+// initialize hero to "home" once on load
+setHeroState('home');
+
+</script>
+</body>
+</html>
