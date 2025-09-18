@@ -51,9 +51,6 @@ input:focus,textarea:focus,select:focus{
 .how .mini img{width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:#0b1118}
 .how .mini,.how .mini *{color:#fff !important}
 
-/* Status pill */
-.pill{font-size:.8rem;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:.2rem .6rem;margin-left:.5rem;color:#000}
-
 /* Loading bars */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:26px}
 .bar{width:100%;height:3px;background:linear-gradient(90deg,var(--brand-2,#60A5FA),var(--brand,#3B82F6));background-size:180% 100%;animation:bar 1.2s linear infinite;border-radius:999px;opacity:.85}
@@ -77,7 +74,6 @@ input:focus,textarea:focus,select:focus{
 .logo-mark{width:50px;height:50px;border-radius:999px;background:radial-gradient(circle at 30% 30%,var(--brand),var(--brand-2))}
 .brand{display:flex;align-items:center;gap:.6rem;cursor:pointer}
 
-/* HOW images ratio */
 #sectionA .how .mini,
 #sectionA .mini{background:var(--panel)!important;color:#fff!important;border:1px solid var(--border)!important}
 #sectionA .how .mini img,
@@ -100,9 +96,15 @@ input:focus,textarea:focus,select:focus{
 .site-footer{margin:30px auto 10px;text-align:center;font-size:.9rem;color:#6b7280}
 .site-footer a{color:inherit;text-decoration:underline}
 
-/* CTA visibility: only on home */
+/* CTA visibility:
+   - visible ONLY on .is-home
+   - hidden on .is-editing, .is-loading, .is-ready
+*/
 #uploadCTA{display:none}
 .is-home #uploadCTA{display:block}
+.is-editing #uploadCTA,
+.is-loading #uploadCTA,
+.is-ready   #uploadCTA{display:none}
 </style>
 </head>
 <body>
@@ -169,7 +171,7 @@ input:focus,textarea:focus,select:focus{
 
         <div class="stack" style="margin-top:6px">
           <label>Describe your changes</label>
-          <!-- no hardcoded placeholder; set from CONFIG -->
+          <!-- placeholder set via CONFIG -->
           <textarea id="prompt2Input" class="field"></textarea>
         </div>
 
@@ -225,7 +227,7 @@ input:focus,textarea:focus,select:focus{
 </div>
 
 <script>
-/************* CONFIG — EDIT PER BRAND (unchanged) *************/
+/************* CONFIG — EDIT PER BRAND *************/
 const CONFIG = {
   BRAND_NAME: "Kiwiscapes",
   LOGO_URL: "https://scontent-lhr8-1.xx.fbcdn.net/v/t39.30808-6/295299219_744734090017986_6199590293080603021_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=bJ8P4Z6IHqYQ7kNvwGHDC8n&_nc_oc=AdkKG5zVmWGwNBVRsS1vU6bfww69T8PKIxqVCbepDzZOF4wKCrvjktvTsCjEL-XrYGaJ_gxVdGTpnYgTH1NaZSk3&_nc_zt=23&_nc_ht=scontent-lhr8-1.xx&_nc_gid=ZuLUGCRlOFO4GuDQ6yayoQ&oh=00_AfbD8AK2Pu5GyjJP8ql58GlWRsqx_Vr6yadb80XCLjNztQ&oe=68D21AFA",
@@ -236,11 +238,11 @@ const CONFIG = {
   ACCENT:  "#60A5FA",
   WORKER_URL: "https://seeitdone-demo.muddy-silence-4f5b.workers.dev",
   PRESET_PROMPT:
-    "Keep results photorealistic and faithful to the original photo. Preserve everything except what the user asks to change. No text or people. Keep consistent lighting, materials, buildings, garden size, doors, windows, surroundings and perspective. Final image must look like a real photograph.",
+    "Landscape the garden per the user’s instructions. Keep the image photorealistic and true to the original. Change only what’s requested. No text or people. Preserve camera angle, lighting, materials, buildings, garden size, doors, windows, surroundings, and perspective.",
   HOW_STEP_IMAGES: [
-    "https://i.ibb.co/F4z2WmfF/Copy-of-Add-a-subheading.png",
-    "https://i.ibb.co/whjxwKw3/Add-a-subheading-3.png",
-    "https://i.ibb.co/Hfd8j0Gj/Copy-of-Add-a-subheading-1.png"
+    "https://i.ibb.co/tMB8NYM7/images-before-after-nov19-West-before.webp",
+    "https://i.ibb.co/84zGpY6n/Add-a-subheading-2.png",
+    "https://i.ibb.co/bjhDYjwH/eec17a04-71d0-4b16-aa23-f17b82b526cd.png"
   ],
   PROMPT_PLACEHOLDER: "Add a patio, plant some trees, and make the lawn greener.",
   REQUEST_TIMEOUT_MS: 180000,
@@ -298,12 +300,18 @@ function setHeroState(state) {
   const subEls   = document.querySelectorAll('#pageSub, .hero .lead');
   const setText  = (els, text)=> els.forEach(el => { if (el) el.textContent = text; });
 
-  document.body.classList.remove('is-home','is-loading','is-ready');
+  document.body.classList.remove('is-home','is-editing','is-loading','is-ready');
 
   if (state === 'home') {
     document.body.classList.add('is-home');
     setText(titleEls, CONFIG.TITLE);
     setText(subEls, 'Upload a photo and preview changes in 60 seconds.');
+    return;
+  }
+  if (state === 'editing') {
+    document.body.classList.add('is-editing');
+    setText(titleEls, 'Describe your changes');
+    setText(subEls, '');
     return;
   }
   if (state === 'loading') {
@@ -435,6 +443,7 @@ async function handleFileSelect(e){
 
     previewSmall.src = originalImageUrl;
     show(sectionB);
+    setHeroState('editing'); // hide upload CTA after selecting a file
   };
   img.onerror = ()=> showToast('Could not read image','error');
   img.src = originalImageUrl;
