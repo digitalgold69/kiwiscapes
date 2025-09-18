@@ -5,13 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>See It Done — Visualiser</title>
 <style>
-/* ==== Base (dark palette variables kept for the dark tiles) ==== */
 :root{
   --bg:#0b0f14;--panel:#0f141b;--panel-2:#0b1118;--brand:#5b9dff;--brand-2:#87b6ff;
   --ok:#55d69e;--warn:#f0b232;--err:#ff6b6b;--ink:#dce6f2;--muted:#9fb3c8;--border:#1b2330;
   --glow:0 10px 30px rgba(91,157,255,.18);
 }
-/* ==== App-wide LIGHT theme ==== */
 body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fff;color:#000;line-height:1.6}
 .container{max-width:980px;margin:0 auto;padding:20px}
 
@@ -45,44 +43,18 @@ input:focus,textarea:focus,select:focus{
 .row{display:flex;gap:12px;flex-wrap:wrap}
 .subtle{color:#6b7280;font-size:.95rem}
 
-/* ---- HOW IT WORKS layout + title ---- */
-.section-heading{
-  font-size: 1.25rem;
-  font-weight: 800;
-  margin-bottom: .75rem;
-  color: #000;
-}
-
-.how{
-  display:grid;
-  grid-template-columns: repeat(3, minmax(0,1fr));
-  gap: 12px;
-}
-@media (max-width: 1023px){
-  .how{ grid-template-columns: 1fr; }
-}
-
-/* Keep the tiles dark with white text */
-.how .mini{
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,.2);
-}
-.how .mini img{
-  width:100%; height:120px; object-fit:cover;
-  border-radius:10px; border:1px solid var(--border); background:#0b1118;
-}
-.how .mini, .how .mini *{ color:#fff !important; }
+/* ---- HOW IT WORKS ---- */
+.section-heading{font-size:1.25rem;font-weight:800;margin-bottom:.75rem;color:#000}
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:1023px){.how{grid-template-columns:1fr}}
+.how .mini{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:0 4px 12px rgba(0,0,0,.2)}
+.how .mini img{width:100%;height:120px;object-fit:cover;border-radius:10px;border:1px solid var(--border);background:#0b1118}
+.how .mini,.how .mini *{color:#fff !important}
 
 /* Status pill */
 .pill{font-size:.8rem;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:999px;padding:.2rem .6rem;margin-left:.5rem;color:#000}
 
-/* Loading panel bars (secondary) */
+/* Loading bars */
 .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:26px}
 .bar{width:100%;height:3px;background:linear-gradient(90deg,var(--brand-2,#60A5FA),var(--brand,#3B82F6));background-size:180% 100%;animation:bar 1.2s linear infinite;border-radius:999px;opacity:.85}
 @keyframes bar{0%{background-position:-120% 0}100%{background-position:120% 0}}
@@ -92,10 +64,9 @@ input:focus,textarea:focus,select:focus{
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.error{background:#ff6b6b;border-color:#e65252}
 
-/* Hide any legacy progress bar */
 #progressBar{display:none !important}
 
-/* Full-screen overlay spinner (primary loader) */
+/* Overlay spinner */
 .loading-overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;flex-direction:column;background:rgba(255,255,255,.85);z-index:2000}
 .loading-overlay.show{display:flex}
 .loader-spinner{width:56px;height:56px;border-radius:50%;border:4px solid #e5e7eb;border-top-color:var(--brand,#3B82F6);animation:sid-spin 1s linear infinite;margin-bottom:12px}
@@ -106,50 +77,32 @@ input:focus,textarea:focus,select:focus{
 .logo-mark{width:50px;height:50px;border-radius:999px;background:radial-gradient(circle at 30% 30%,var(--brand),var(--brand-2))}
 .brand{display:flex;align-items:center;gap:.6rem;cursor:pointer}
 
-/* HOW IT WORKS tiles: keep dark + 763×507 images correctly */
+/* HOW images ratio */
 #sectionA .how .mini,
-#sectionA .mini{
-  background: var(--panel) !important;
-  color: #fff !important;
-  border: 1px solid var(--border) !important;
-}
+#sectionA .mini{background:var(--panel)!important;color:#fff!important;border:1px solid var(--border)!important}
 #sectionA .how .mini img,
-#sectionA .mini img{
-  display:block;width:100%;height:auto !important;aspect-ratio:763/507;object-fit:cover;
-  background:transparent !important;border-radius:10px;border:1px solid var(--border);
-}
+#sectionA .mini img{display:block;width:100%;height:auto!important;aspect-ratio:763/507;object-fit:cover;background:transparent!important;border-radius:10px;border:1px solid var(--border)}
 
-/* Header & hero centering */
-.header-content { display:flex; justify-content:center; align-items:center; padding:16px 0 !important; }
-.brand-centered{ display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap; text-align:center; margin:0 auto; }
-.logo-img{ height:72px; display:none; }
-.logo-mark{ width:48px; height:48px; border-radius:12px; }
-@media (max-width: 640px){ .brand-centered{flex-direction:column;} }
+/* Header & hero */
+.header-content{display:flex;justify-content:center;align-items:center;padding:16px 0!important}
+.brand-centered{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;margin:0 auto}
+.logo-img{height:72px;display:none}
+.logo-mark{width:48px;height:48px;border-radius:12px}
+@media (max-width:640px){.brand-centered{flex-direction:column}}
 
-/* Hero */
-.hero{
-  background: linear-gradient(180deg, rgba(59,130,246,.08), rgba(59,130,246,0) 60%);
-  border:1px solid #e8eef7; border-radius:16px; padding:18px 20px; margin:14px 0;
-  text-align:center;
-}
+.hero{background:linear-gradient(180deg,rgba(59,130,246,.08),rgba(59,130,246,0) 60%);border:1px solid #e8eef7;border-radius:16px;padding:18px 20px;margin:14px 0;text-align:center}
 
-/* Upload CTA centering */
-#uploadCTA .cta-center{
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;
-}
-/* Remove helper text margin if present */
-#uploadCTA .subtle{ display:none !important; } /* Hide “JPG or PNG…” */
+/* Upload CTA */
+#uploadCTA .cta-center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+#uploadCTA .subtle{display:none!important} /* hide “JPG or PNG…” */
 
-/* Footer (Powered by) */
-.site-footer{
-  margin:30px auto 10px; text-align:center; font-size:.9rem; color:#6b7280;
-}
-.site-footer a{ color:inherit; text-decoration:underline; }
+/* Footer */
+.site-footer{margin:30px auto 10px;text-align:center;font-size:.9rem;color:#6b7280}
+.site-footer a{color:inherit;text-decoration:underline}
 
-/* Upload CTA visibility rules */
-#uploadCTA { display: none; }           /* hidden by default */
-.is-home #uploadCTA { display: block; } /* only show on home */
-
+/* CTA visibility: only on home */
+#uploadCTA{display:none}
+.is-home #uploadCTA{display:block}
 </style>
 </head>
 <body>
@@ -174,7 +127,7 @@ input:focus,textarea:focus,select:focus{
         <p class="lead" id="pageSub">Upload a photo and preview changes in 60 seconds.</p>
       </section>
 
-      <!-- Upload CTA (centered) -->
+      <!-- Upload CTA -->
       <section id="uploadCTA" class="card" style="margin-top:14px">
         <div class="cta-center">
           <button class="btn btn-primary upload-btn" id="uploadBtn">
@@ -216,7 +169,8 @@ input:focus,textarea:focus,select:focus{
 
         <div class="stack" style="margin-top:6px">
           <label>Describe your changes</label>
-          <textarea id="prompt2Input" class="field" placeholder="Paint the backsplash white, make the countertop white granite and make the cupboard door handles gold."></textarea>
+          <!-- no hardcoded placeholder; set from CONFIG -->
+          <textarea id="prompt2Input" class="field"></textarea>
         </div>
 
         <div class="row" style="margin-top:12px">
@@ -225,7 +179,7 @@ input:focus,textarea:focus,select:focus{
         <p class="subtle" style="margin-top:6px" aria-hidden="true"></p>
       </section>
 
-      <!-- LOADING (secondary, behind overlay) -->
+      <!-- LOADING -->
       <section id="loadingPanel" class="card loading" style="display:none;margin-top:14px">
         <div class="bar"></div>
         <div class="bar" style="width:70%"></div>
@@ -265,7 +219,6 @@ input:focus,textarea:focus,select:focus{
 
 <div id="toast" class="toast"></div>
 
-<!-- Full-screen loading overlay -->
 <div id="loadingOverlay" class="loading-overlay" aria-live="polite">
   <div class="loader-spinner"></div>
   <p class="loader-text">Processing your image… this can take up to 60 seconds.</p>
@@ -278,14 +231,18 @@ const CONFIG = {
   LOGO_URL: "https://scontent-lhr8-1.xx.fbcdn.net/v/t39.30808-6/295299219_744734090017986_6199590293080603021_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=bJ8P4Z6IHqYQ7kNvwGHDC8n&_nc_oc=AdkKG5zVmWGwNBVRsS1vU6bfww69T8PKIxqVCbepDzZOF4wKCrvjktvTsCjEL-XrYGaJ_gxVdGTpnYgTH1NaZSk3&_nc_zt=23&_nc_ht=scontent-lhr8-1.xx&_nc_gid=ZuLUGCRlOFO4GuDQ6yayoQ&oh=00_AfbD8AK2Pu5GyjJP8ql58GlWRsqx_Vr6yadb80XCLjNztQ&oe=68D21AFA",
   TITLE: "Visualise Your New Garden",
   AREA_NOUN: "Garden",
-  DEFAULT_AREA: "auto", // or "wall" / "all" depending on what your worker supports
+  DEFAULT_AREA: "auto", // or "wall" / "all"
   PRIMARY: "#5d7749",
   ACCENT:  "#60A5FA",
   WORKER_URL: "https://seeitdone-demo.muddy-silence-4f5b.workers.dev",
   PRESET_PROMPT:
     "Keep results photorealistic and faithful to the original photo. Preserve everything except what the user asks to change. No text or people. Keep consistent lighting, materials, buildings, garden size, doors, windows, surroundings and perspective. Final image must look like a real photograph.",
-  HOW_STEP_IMAGES: ["https://i.ibb.co/tMB8NYM7/images-before-after-nov19-West-before.webp","https://i.ibb.co/84zGpY6n/Add-a-subheading-2.png","https://i.ibb.co/bjhDYjwH/eec17a04-71d0-4b16-aa23-f17b82b526cd.png"],
-  PROMPT_PLACEHOLDER: "Add a patio, plant some trees, and make the lawn greener."
+  HOW_STEP_IMAGES: [
+    "https://i.ibb.co/tMB8NYM7/images-before-after-nov19-West-before.webp",
+    "https://i.ibb.co/84zGpY6n/Add-a-subheading-2.png",
+    "https://i.ibb.co/bjhDYjwH/eec17a04-71d0-4b16-aa23-f17b82b526cd.png"
+  ],
+  PROMPT_PLACEHOLDER: "Add a patio, plant some trees, and make the lawn greener.",
   REQUEST_TIMEOUT_MS: 180000,
   MAX_FILE_MB: 5,
   EMAIL: { enabled: false }
@@ -335,6 +292,34 @@ const howImg3 = $('#howImg3');
 const toast = $('#toast');
 const loadingOverlay = document.getElementById('loadingOverlay');
 
+/************* HERO STATE (controls CTA visibility) *************/
+function setHeroState(state) {
+  const titleEls = document.querySelectorAll('#pageTitle, .hero h1');
+  const subEls   = document.querySelectorAll('#pageSub, .hero .lead');
+  const setText  = (els, text)=> els.forEach(el => { if (el) el.textContent = text; });
+
+  document.body.classList.remove('is-home','is-loading','is-ready');
+
+  if (state === 'home') {
+    document.body.classList.add('is-home');
+    setText(titleEls, CONFIG.TITLE);
+    setText(subEls, 'Upload a photo and preview changes in 60 seconds.');
+    return;
+  }
+  if (state === 'loading') {
+    document.body.classList.add('is-loading');
+    setText(titleEls, 'Our AI fairys are working on your image!');
+    setText(subEls, '');
+    return;
+  }
+  if (state === 'ready') {
+    document.body.classList.add('is-ready');
+    setText(titleEls, 'Your Image is Ready');
+    setText(subEls, '');
+    return;
+  }
+}
+
 /************* BRANDING *************/
 (function initBranding(){
   // Colors
@@ -348,9 +333,15 @@ const loadingOverlay = document.getElementById('loadingOverlay');
   verticalPill.textContent = `${CONFIG.AREA_NOUN} Visualizer`;
 
   // Nouns
-  const noun = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase(); // 'Kitchen' is just a fallback
+  const noun = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase(); // fallback only
   const el2 = document.getElementById('areaWord2Label'); if (el2) el2.textContent = noun;
   const el1 = document.getElementById('areaWord1');     if (el1) el1.textContent = noun;
+
+  // Prompt placeholder
+  const promptBox = document.getElementById('prompt2Input');
+  if (promptBox && CONFIG.PROMPT_PLACEHOLDER) {
+    promptBox.placeholder = CONFIG.PROMPT_PLACEHOLDER;
+  }
 
   // Logo
   if (CONFIG.LOGO_URL){
@@ -359,42 +350,15 @@ const loadingOverlay = document.getElementById('loadingOverlay');
     logoFallback.style.display = 'none';
   }
 
-  // Prompt box placeholder (pulled from CONFIG)
-  const promptBox = document.getElementById('prompt2Input');
-  if (promptBox && CONFIG.PROMPT_PLACEHOLDER) {
-    promptBox.placeholder = CONFIG.PROMPT_PLACEHOLDER;
-  }
-
   // How it works images
   [howImg1, howImg2, howImg3].forEach((el, i)=>{
     const url = CONFIG.HOW_STEP_IMAGES?.[i];
     if (url){ el.src = url; el.style.display = 'block'; }
   });
 
-  // Initial hero state
+  // Start in home state so CTA is visible
   setHeroState('home');
 })();
-
-/************* SIMPLE HERO STATE (single source of truth) *************/
-function setHeroState(state) {
-  const titleEls = document.querySelectorAll('#pageTitle, .hero h1');
-  const subEls   = document.querySelectorAll('#pageSub, .hero .lead');
-
-  const setText = (els, text)=> els.forEach(el => { if (el) el.textContent = text; });
-
-  if (state === 'home') {
-    setText(titleEls, CONFIG.TITLE);
-    setText(subEls, 'Upload a photo and preview changes in 60 seconds.');
-  }
-  if (state === 'loading') {
-    setText(titleEls, 'Our AI fairys are working on your image!');
-    setText(subEls, '');
-  }
-  if (state === 'ready') {
-    setText(titleEls, 'Your Image is Ready');
-    setText(subEls, '');
-  }
-}
 
 /************* HELPERS *************/
 function show(section){
@@ -489,11 +453,11 @@ async function generateNow(){
     return;
   }
 
-const areaToEdit = (
-  CONFIG.DEFAULT_AREA && CONFIG.DEFAULT_AREA !== 'auto'
-    ? CONFIG.DEFAULT_AREA
-    : (CONFIG.AREA_NOUN || 'kitchen')
-).toLowerCase();
+  const areaToEdit = (
+    CONFIG.DEFAULT_AREA && CONFIG.DEFAULT_AREA !== 'auto'
+      ? CONFIG.DEFAULT_AREA
+      : (CONFIG.AREA_NOUN || 'kitchen')
+  ).toLowerCase();
 
   const combinedPrompt =
     `${CONFIG.PRESET_PROMPT}\n\n` +
@@ -510,7 +474,6 @@ const areaToEdit = (
   const kill = setTimeout(()=> ctrl.abort(), CONFIG.REQUEST_TIMEOUT_MS);
 
   try {
-    // 1) mask
     const maskRes = await fetch(`${CONFIG.WORKER_URL}/generate-mask`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -528,7 +491,6 @@ const areaToEdit = (
     const { maskBase64 } = await maskRes.json();
     if (!maskBase64) throw new Error('No mask returned from server');
 
-    // 2) inpaint
     const paintRes = await fetch(`${CONFIG.WORKER_URL}/inpainting`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -547,7 +509,6 @@ const areaToEdit = (
     if (!paintJson.images || !paintJson.images[0]) throw new Error('No image returned from inpainting');
     const result1024 = `data:image/png;base64,${paintJson.images[0]}`;
 
-    // 3) de-letterbox to original size
     const out = new Image();
     out.onload = ()=>{
       const c = document.createElement('canvas');
@@ -564,7 +525,6 @@ const areaToEdit = (
 
       setHeroState('ready');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-
       showToast('Image generated successfully!');
     };
     out.onerror = ()=> { throw new Error('Failed to decode result image'); };
@@ -595,7 +555,7 @@ generateMoreBtn.addEventListener('click', resetToStart);
 brandHome.addEventListener('click', resetToStart);
 emailSendBtn.addEventListener('click', emailResult);
 
-/************* STATUS PING (optional; shows connectivity in console) *************/
+/************* STATUS PING (optional) *************/
 (async function ping(){
   try{
     const r = await fetch(`${CONFIG.WORKER_URL}/`, {method:'GET'});
