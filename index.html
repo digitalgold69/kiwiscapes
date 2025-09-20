@@ -13,37 +13,46 @@
 body{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#fff;color:#000;line-height:1.6}
 .container{max-width:980px;margin:0 auto;padding:20px}
 
+/* Header */
 header{position:sticky;top:0;background:#fff !important;border-bottom:1px solid #e8eef7 !important;z-index:50}
 header *{color:#000 !important}
+.header-content{display:flex;justify-content:center;align-items:center;padding:16px 0!important}
+.brand-centered{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;margin:0 auto}
+.logo-img{height:72px;display:none}
+.logo-mark{width:48px;height:48px;border-radius:12px;background:radial-gradient(circle at 30% 30%,var(--brand),var(--brand-2))}
+.pill{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:.35rem .7rem;border-radius:999px;font-weight:700;
+  background:var(--brand); color:#000; border:1px solid #d6deea;
+  box-shadow:var(--glow); line-height:1; font-size:.9rem
+}
 
-h1{font-size:1.9rem;margin:.25rem 0 .15rem}
-p.lead{color:#374151}
-
+/* Cards & buttons */
 .card{background:#fff;color:#000;border:1px solid #e8eef7;box-shadow:0 2px 8px rgba(18,32,56,.06);border-radius:16px;padding:18px}
-
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:0;border-radius:10px;padding:1rem 1.25rem;cursor:pointer;transition:.15s;font-size:1.25rem;font-weight:700;color:#000 !important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:0;border-radius:10px;padding:1rem 1.25rem;cursor:pointer;transition:.15s;font-size:1.1rem;font-weight:700;color:#000 !important}
 .btn-primary{background:var(--brand);box-shadow:var(--glow)}
 .btn-primary:hover{filter:brightness(1.05)}
 .btn-ghost{background:transparent;border:1px solid #d6deea}
 
+/* Fields */
 .field, input, textarea, select{
-  width:100%;background:#fff;color:#111827;
-  border:1px solid #d6deea;border-radius:10px;padding:1rem;box-shadow:none
+  width:100%;background:#fff;color:#111827;border:1px solid #d6deea;border-radius:12px;padding:1rem 1.1rem;box-shadow:none
 }
 input::placeholder,textarea::placeholder{color:#6b7280}
-input:focus,textarea:focus,select:focus{
-  outline:none;border-color:var(--brand,#3B82F6);box-shadow:0 0 0 4px rgba(59,130,246,.15)
-}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--brand,#3B82F6);box-shadow:0 0 0 4px rgba(59,130,246,.15)}
+/* Bigger, clearer prompt box */
+#prompt2Input{min-height:160px;font-size:1.05rem}
 
-.preview{width:100%;height:180px;background:#f8fafc;border:1px solid #e8eef7;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+/* Previews */
+.preview{width:100%;height:220px;background:#f8fafc;border:1px solid #e8eef7;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .preview img{max-width:100%;max-height:100%;object-fit:contain}
-.result{width:100%;height:420px;background:#f8fafc;border:1px solid #e8eef7;border-radius:10px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.result{width:100%;height:460px;background:#f8fafc;border:1px solid #e8eef7;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
 .result img{max-width:100%;max-height:100%;object-fit:contain}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .row{display:flex;gap:12px;flex-wrap:wrap}
 .subtle{color:#6b7280;font-size:.95rem}
 
-/* ---- HOW IT WORKS ---- */
+/* HOW IT WORKS */
 .section-heading{font-size:1.25rem;font-weight:800;margin-bottom:.75rem;color:#000}
 .how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:1023px){.how{grid-template-columns:1fr}}
@@ -70,36 +79,23 @@ input:focus,textarea:focus,select:focus{
 .loader-text{color:#111827}
 @keyframes sid-spin{to{transform:rotate(360deg)}}
 
-.logo-img{height:100px;display:none}
-.logo-mark{width:50px;height:50px;border-radius:999px;background:radial-gradient(circle at 30% 30%,var(--brand),var(--brand-2))}
-.brand{display:flex;align-items:center;gap:.6rem;cursor:pointer}
-
 #sectionA .how .mini,
 #sectionA .mini{background:var(--panel)!important;color:#fff!important;border:1px solid var(--border)!important}
 #sectionA .how .mini img,
 #sectionA .mini img{display:block;width:100%;height:auto!important;aspect-ratio:763/507;object-fit:cover;background:transparent!important;border-radius:10px;border:1px solid var(--border)}
 
-/* Header & hero */
-.header-content{display:flex;justify-content:center;align-items:center;padding:16px 0!important}
-.brand-centered{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;text-align:center;margin:0 auto}
-.logo-img{height:72px;display:none}
-.logo-mark{width:48px;height:48px;border-radius:12px}
-@media (max-width:640px){.brand-centered{flex-direction:column}}
-
+/* Hero */
 .hero{background:linear-gradient(180deg,rgba(59,130,246,.08),rgba(59,130,246,0) 60%);border:1px solid #e8eef7;border-radius:16px;padding:18px 20px;margin:14px 0;text-align:center}
 
 /* Upload CTA */
 #uploadCTA .cta-center{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
-#uploadCTA .subtle{display:none!important} /* hide “JPG or PNG…” */
+#uploadCTA .subtle{display:none!important}
 
 /* Footer */
 .site-footer{margin:30px auto 10px;text-align:center;font-size:.9rem;color:#6b7280}
 .site-footer a{color:inherit;text-decoration:underline}
 
-/* CTA visibility:
-   - visible ONLY on .is-home
-   - hidden on .is-editing, .is-loading, .is-ready
-*/
+/* CTA visibility by state */
 #uploadCTA{display:none}
 .is-home #uploadCTA{display:block}
 .is-editing #uploadCTA,
@@ -115,7 +111,7 @@ input:focus,textarea:focus,select:focus{
       <img id="logoImg" class="logo-img" alt="Logo" />
       <div class="logo-mark" id="logoFallback"></div>
       <strong class="app-name" id="brandName">Odd Fellows Contracting</strong>
-      <span class="pill" id="verticalPill">Kitchen Visualizer</span>
+      <span class="pill" id="verticalPill">Garden Visualizer</span>
     </div>
   </div>
 </header>
@@ -165,20 +161,19 @@ input:focus,textarea:focus,select:focus{
       <section id="sectionB" class="card" style="display:none;margin-top:14px">
         <div class="preview"><img id="previewSmall" alt="Preview" /></div>
 
-        <div class="row" style="margin:10px 0 6px">
+        <div class="row" style="margin:12px 0 6px">
           <button class="btn btn-ghost" id="changeImageBtn">Change image</button>
         </div>
 
         <div class="stack" style="margin-top:6px">
-          <label>Describe your changes</label>
-          <!-- placeholder set via CONFIG -->
-          <textarea id="prompt2Input" class="field"></textarea>
+          <label style="font-weight:700">Describe your changes</label>
+          <textarea id="prompt2Input" class="field" placeholder="Add a patio, plant some trees, and make the lawn greener."></textarea>
+          <div class="subtle">Tip: For best results, be as specific and detailed as possible.</div>
         </div>
 
         <div class="row" style="margin-top:12px">
           <button class="btn btn-primary" id="generateNowBtn">Generate now</button>
         </div>
-        <p class="subtle" style="margin-top:6px" aria-hidden="true"></p>
       </section>
 
       <!-- LOADING -->
@@ -193,7 +188,8 @@ input:focus,textarea:focus,select:focus{
       <section id="sectionC" class="card" style="display:none;margin-top:14px">
         <div class="result"><img id="resultImage" alt="Result" /></div>
         <div class="row" style="margin-top:12px">
-          <button class="btn btn-primary" id="generateMoreBtn">Generate more</button>
+          <button class="btn btn-primary" id="downloadBtn">Download image</button>
+          <button class="btn btn-ghost" id="generateMoreBtn">Generate more</button>
         </div>
 
         <div class="grid2" style="margin-top:16px">
@@ -226,6 +222,10 @@ input:focus,textarea:focus,select:focus{
   <p class="loader-text">Processing your image… this can take up to 60 seconds.</p>
 </div>
 
+<!-- Optional helpers for orientation & HEIC; safe to keep even if not used -->
+<script src="https://unpkg.com/exifr/dist/lite.umd.js"></script>
+<script src="https://unpkg.com/heic2any/dist/heic2any.min.js"></script>
+
 <script>
 /************* CONFIG — EDIT PER BRAND *************/
 const CONFIG = {
@@ -246,7 +246,6 @@ const CONFIG = {
   ],
   PROMPT_PLACEHOLDER: "Add a patio, plant some trees, and make the lawn greener.",
   REQUEST_TIMEOUT_MS: 180000,
-  MAX_FILE_MB: 5,
   EMAIL: { enabled: false }
 };
 
@@ -283,6 +282,7 @@ const resultImage   = $('#resultImage');
 const originalImage = $('#originalImage');
 const previewSmall  = $('#previewSmall');
 const generateMoreBtn = $('#generateMoreBtn');
+const downloadBtn = $('#downloadBtn');
 
 const emailInput = $('#emailInput');
 const emailSendBtn = $('#emailSendBtn');
@@ -341,7 +341,7 @@ function setHeroState(state) {
   verticalPill.textContent = `${CONFIG.AREA_NOUN} Visualizer`;
 
   // Nouns
-  const noun = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase(); // fallback only
+  const noun = (CONFIG.AREA_NOUN || 'Kitchen').toLowerCase();
   const el2 = document.getElementById('areaWord2Label'); if (el2) el2.textContent = noun;
   const el1 = document.getElementById('areaWord1');     if (el1) el1.textContent = noun;
 
@@ -408,38 +408,41 @@ function hideLoadingOverlay(){
   loadingOverlay.classList.remove('show');
 }
 
-/************* IMAGE HANDLING (LETTERBOX 1024) *************/
+/************* IMAGE HANDLING (robust: accept any size/format) *************/
 async function handleFileSelect(e){
   const file = e?.target?.files?.[0];
   if (!file) return;
+  if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name||'')) {
+    return showToast('Please select an image file','error');
+  }
 
-  if (!/^image\//.test(file.type)) return showToast('Please select an image file','error');
-  if (file.size > CONFIG.MAX_FILE_MB * 1024 * 1024) return showToast(`File exceeds ${CONFIG.MAX_FILE_MB}MB`,'error');
-
-  currentFile = file;
+  currentFile = await normalizeImageFile(file); // convert HEIC → JPEG if needed
   if (originalImageUrl) URL.revokeObjectURL(originalImageUrl);
-  originalImageUrl = URL.createObjectURL(file);
+  originalImageUrl = URL.createObjectURL(currentFile);
 
+  // Decode & apply EXIF orientation
   const img = new Image();
-  img.onload = ()=>{
+  img.onload = async ()=>{
     origW = img.naturalWidth; origH = img.naturalHeight;
 
+    // Build a 1024x1024 letterbox (keeps compatibility with your Worker pipeline)
     const canvas = document.createElement('canvas');
     canvas.width = 1024; canvas.height = 1024;
     const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.clearRect(0,0,1024,1024);
 
+    // Fit image inside 1024 square
     scale = Math.min(1024 / origW, 1024 / origH);
     finalWidth  = Math.round(origW * scale);
     finalHeight = Math.round(origH * scale);
     paddedX = Math.round((1024 - finalWidth) / 2);
     paddedY = Math.round((1024 - finalHeight) / 2);
-
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'high';
-    ctx.clearRect(0,0,1024,1024);
     ctx.drawImage(img, paddedX, paddedY, finalWidth, finalHeight);
 
-    letterboxedDataUrl = canvas.toDataURL('image/png', 1.0);
+    // Use high-quality JPEG to keep size well below any limits while preserving quality
+    letterboxedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
 
     previewSmall.src = originalImageUrl;
     show(sectionB);
@@ -447,6 +450,19 @@ async function handleFileSelect(e){
   };
   img.onerror = ()=> showToast('Could not read image','error');
   img.src = originalImageUrl;
+}
+
+// Converts HEIC if present; otherwise returns the original file.
+async function normalizeImageFile(file){
+  const name = (file.name||'').toLowerCase();
+  const isHeic = name.endsWith('.heic') || name.endsWith('.heif') || (file.type||'').includes('heic');
+  if (isHeic && window.heic2any){
+    try{
+      const converted = await window.heic2any({ blob:file, toType:'image/jpeg', quality:0.95 });
+      return new File([converted], (file.name||'image').replace(/\.(heic|heif)$/i,'.jpg'), { type:'image/jpeg' });
+    }catch(e){ /* fall back to original */ }
+  }
+  return file;
 }
 
 /************* GENERATE (MASK ➜ INPAINT ➜ RESTORE) *************/
@@ -548,6 +564,18 @@ async function generateNow(){
   }
 }
 
+/************* DOWNLOAD *************/
+function downloadImage(){
+  if (!resultRestoredUrl) return showToast('Generate an image first','error');
+  const a = document.createElement('a');
+  const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+  a.href = resultRestoredUrl;
+  a.download = `see-it-done-${ts}.png`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 /************* EMAIL (placeholder) *************/
 async function emailResult(){
   const email = (emailInput.value||'').trim();
@@ -561,6 +589,7 @@ changeImageBtn.addEventListener('click', ()=> fileInput.click());
 fileInput.addEventListener('change', handleFileSelect);
 generateNowBtn.addEventListener('click', generateNow);
 generateMoreBtn.addEventListener('click', resetToStart);
+downloadBtn.addEventListener('click', downloadImage);
 brandHome.addEventListener('click', resetToStart);
 emailSendBtn.addEventListener('click', emailResult);
 
