@@ -36,8 +36,19 @@ header *{color:#000 !important}
 
 /* Fields */
 .field, input, textarea, select{
-  width:100%;background:#fff;color:#111827;border:1px solid #d6deea;border-radius:12px;padding:1rem 1.1rem;box-shadow:none
+  width:100%;
+  max-width:100%;
+  box-sizing:border-box;   /* stops spillover inside padded cards */
+  background:#fff;
+  color:#111827;
+  border:1px solid #d6deea;
+  border-radius:12px;
+  padding:1rem 1.1rem;
+  box-shadow:none;
 }
+.card{ overflow:hidden; }                /* clip subpixel bleed */
+textarea{ resize:vertical; display:block; }  /* no horizontal stretching */
+
 input::placeholder,textarea::placeholder{color:#6b7280}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--brand,#3B82F6);box-shadow:0 0 0 4px rgba(59,130,246,.15)}
 /* Bigger, clearer prompt box */
